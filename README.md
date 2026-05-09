@@ -65,6 +65,8 @@ skills/
 
 scripts/                 ready-to-run launcher shell scripts
 benchmarks/              raw numbers
+  qwen27b-kv-quant-sweep.md     KV-quant + ctx sweep on Qwen3.6-27B Q4_K_S
+  eval-reports/                 HumanEval + PinchBench cross-model results
 ```
 
 The `skills/*/SKILL.md` files are written in
