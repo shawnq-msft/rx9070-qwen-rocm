@@ -82,10 +82,43 @@ Full sweep table in `references/kv-quant-sweep-rx9070.md`.
 - Don't use `--no-kv-offload` — hybrid model still computes RS on GPU; speed collapses.
 
 ## Things NOT to do on this model/machine
-- Don't reach for TurboQuant TQ4 / K4V3 KV: TurboQuant llama.cpp forks need TurboQuant weights (none on HF for 27B), and KV is not the bottleneck.
 - Don't reach for vLLM: only Qwopus 9B GPTQ verified here; 27B GPTQ weights ~18-20 GB > 16 GB.
 - Don't try ctx ≥ 32768 with KV q8_0 — compute pp buffer doesn't fit.
 - Don't pick MTP variants (froggeric / havenoammo / RDson): mainline llama.cpp does not decode MTP heads → no speed gain, just bigger files.
+
+## Qwen3.6-27B-TQ3_4S (turboquant fork) — current reasoning-on agent profile
+This repo now also tracks a **TurboQuant-weighted** Qwen3.6-27B variant:
+- model: `/home/qiushuo/models/qwen/YTan2000-Qwen3.6-27B-TQ3_4S/Qwen3.6-27B-TQ3_4S.gguf`
+- runtime: `/home/qiushuo/src/llama.cpp-tq3/build-gfx1201-tq3/bin/llama-server`
+- launcher: `scripts/qwen27b-tq3-reasoning-on.sh`
+
+Verified live reasoning-on serve shape:
+```bash
+/home/qiushuo/src/llama.cpp-tq3/build-gfx1201-tq3/bin/llama-server \
+  -m /home/qiushuo/models/qwen/YTan2000-Qwen3.6-27B-TQ3_4S/Qwen3.6-27B-TQ3_4S.gguf \
+  --host 127.0.0.1 --port 8250 \
+  -ngl 99 -fa on -ctk q4_0 -ctv tq3_0 \
+  -c 65536 -ub 64 -b 256 --parallel 1 \
+  --jinja
+```
+
+Current status:
+- `task_sanity` passed on the reasoning-off reference shape (8247)
+- `task_sanity` also passed on the reasoning-on shape (8250)
+- result files:
+  - `/home/qiushuo/reports/pinchbench/qwen36-27b-tq3-4s-task-sanity-8247/0002_qwen3-6-27b-tq3_4s-gguf.json`
+  - `/home/qiushuo/reports/pinchbench/qwen36-27b-tq3-4s-task-sanity-8250-reasoning-on/0003_qwen3-6-27b-tq3_4s-gguf.json`
+
+Operational rule for this TQ3 branch:
+- keep `--jinja`
+- do **not** add `--skip-chat-parsing`
+- for the reasoning-on validation path, do **not** force `--reasoning off`
+- benchmark sequentially and insert a cooldown between tasks on this 16 GB card
+
+The dedicated smoke runner is:
+- `scripts/run_qwen27b_tq3_reasoning_on_5task_smoke.sh`
+
+That runner executes the standard 5-task smoke one task at a time and sleeps **30 seconds between tasks**, which is the current recommended pattern for this TQ3 reasoning-on validation path.
 
 ## Model variant guidance (HF, sizes verified)
 Best for this box: `unsloth/Qwen3.6-27B-GGUF` Q4_K_S (14.76 GiB) or IQ4_XS (15.44 GiB).

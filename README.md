@@ -76,7 +76,7 @@ Caveats: PinchBench uses llama.cpp's OpenAI endpoint which doesn't return
 a `usage` block, so token counts in those rows are 0 by harness design,
 not model bug. vLLM TurboQuant `tps` is per-request decode rate, not
 aggregate throughput — apples-to-apples vs llama.cpp single-stream only.
-Full eval data: `benchmarks/eval-reports/`.
+Full eval data: `benchmarks/eval-reports/`, especially `benchmarks/eval-reports/qwen27b-vs-qwen35b-tq3-agent-bench-2026-05.md`.
 
 ## TL;DR for picking a stack
 
@@ -111,6 +111,9 @@ Full eval data: `benchmarks/eval-reports/`.
    on dGPUs** (upstream APU-vs-dGPU bug in `CUDACachingAllocator.cpp`).
    You need either a source build or a patch + librocprofiler-register
    stub for it to actually take effect.
+7. **35B FP8 + vLLM is not the current 16 GB baseline.** Local 35B work uses
+   the llama.cpp TQ3_4S GGUF path; FP8/vLLM is treated as not fitting this
+   card reliably, while GGUF TQ3_4S runs at 64k context.
 
 ## Layout
 
