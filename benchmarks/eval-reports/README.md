@@ -7,6 +7,7 @@ vLLM TurboQuant, PinchBench) — schema notes are in the
 
 ## Files
 
+- `qwen36-35b-tq3-4s-64k-humaneval-2026-05.md` — Qwen3.6-35B-A3B TQ3_4S 64k deep-KV HumanEval fullset: 97/164, pass@1 0.5915
 - `pinchbench-humaneval-summary.md` — consolidated table (2026-05-02)
   - HumanEval 1a–1d: lm-eval, vLLM bespoke, llama.cpp KV sweep, vLLM TurboQuant
   - PinchBench 2a–2d: smoke, 3-suite, automated-only, all-suite
@@ -19,6 +20,7 @@ vLLM TurboQuant, PinchBench) — schema notes are in the
 ## Highlights (TL;DR)
 
 HumanEval pass@1 (164 tasks unless marked):
+- llama.cpp **Qwen3.6-35B-A3B TQ3_4S**, ctx 64k, KV K q4_0 / V tq3_0 + FA → **0.5915** (97/164) @ 38.0 aggregate completion tps
 - llama.cpp Qwen3.5-9B **UD-Q6_K_XL + KV q8_0** → **0.7073** @ 32 tps, ctx 16k ★ best small-local
 - llama.cpp Qwen3.5-9B Q8_0 + KV q8_0 → 0.6951 @ 29.5 tps
 - llama.cpp Qwen3.5-9B UD-Q4_K_XL + KV f16 → 0.6707 @ 39.8 tps (fastest small)
